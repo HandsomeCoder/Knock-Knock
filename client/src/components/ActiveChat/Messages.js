@@ -1,4 +1,4 @@
-import { React, useRef } from "react";
+import { React, useRef, useEffect } from "react";
 import { Box } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
@@ -8,11 +8,11 @@ const Messages = (props) => {
 
   const messageConainer = useRef(null);
 
-  setTimeout(() => {
-    if(messageConainer.current && messages[messages.length -1].senderId === userId) {
+  useEffect(() => {
+    if(messageConainer.current && messages[messages.length - 1].senderId === userId) {
       messageConainer.current.scrollTop = messageConainer.current.scrollHeight
     }
-  }, 100)
+  }, [messages.length]);
 
   return (
     <Box ref={messageConainer} className={props.className}>
