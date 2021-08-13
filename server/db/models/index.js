@@ -4,7 +4,9 @@ const Message = require("./message");
 
 // associations
 
-User.hasMany(Conversation);
+User.hasMany(Conversation,{
+        foreignKey: 'updatedByUserId'
+    });
 Conversation.belongsTo(User, { as: "user1" });
 Conversation.belongsTo(User, { as: "user2" });
 Message.belongsTo(Conversation);

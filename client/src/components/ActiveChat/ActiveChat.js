@@ -8,7 +8,9 @@ const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexGrow: 8,
-    flexDirection: "column"
+    flexDirection: "column",
+    maxHeight: "94vh",
+    overflow: "auto"
   },
   chatContainer: {
     marginLeft: 41,
@@ -16,7 +18,13 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    maxHeight: "74vh",
+    overflow: "auto"
+  },
+  chatContent: {
+    maxHeight: "57vh",
+    overflow: "auto"
   }
 }));
 
@@ -34,7 +42,7 @@ const ActiveChat = (props) => {
             online={conversation.otherUser.online || false}
           />
           <Box className={classes.chatContainer}>
-            <Messages
+            <Messages className={classes.chatContent}
               messages={conversation.messages}
               otherUser={conversation.otherUser}
               userId={user.id}
