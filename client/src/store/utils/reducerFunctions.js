@@ -8,6 +8,7 @@ export const addMessageToStore = (state, payload) => {
       messages: [message],
     };
     newConvo.latestMessageText = message.text;
+    newConvo.latestMessageAt = message.updatedAt;
     return [newConvo, ...state];
   }
 
@@ -16,12 +17,12 @@ export const addMessageToStore = (state, payload) => {
       const convoCopy = { ...convo };
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
-
+      convoCopy.latestMessageAt = message.updatedAt;
       return convoCopy;
     } else {
       return convo;
     }
-  });
+  }).sort((a, b) => new Date(b.latestMessageAt) - new Date(a.latestMessageAt));
 };
 
 export const addOnlineUserToStore = (state, id) => {
@@ -81,3 +82,37 @@ export const addNewConvoToStore = (state, recipientId, message) => {
     }
   });
 };
+
+export const updateConversationMessageStatus = (state, conversationId, userId) => {
+  return state.map((convo) => {
+    if (convo.id === conversationId) {
+      const newConvo = { ...convo };
+      newConvo.messages = newConvo.messages.map(msg => {
+        if(msg.senderId !== userId){
+          msg.readStatus = true;
+        }
+        return msg;
+      })
+      return newConvo;
+    } else {
+      return convo;
+    }
+  })
+}
+
+export const conversationMessageRead = (state, conversationId, userId) => {
+  return state.map((convo) => {
+    if (convo.id === conversationId) {
+      const newConvo = { ...convo };
+      newConvo.messages = newConvo.messages.map(msg => {
+        if(msg.senderId === userId){
+          msg.readStatus = true;
+        }
+        return msg;
+      })
+      return newConvo;
+    } else {
+      return convo;
+    }
+  })
+}

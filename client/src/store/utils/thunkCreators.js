@@ -5,7 +5,9 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  updateConversationReadStatus
 } from "../conversations";
+
 import { gotUser, setFetchingStatus } from "../user";
 
 axios.interceptors.request.use(async function (config) {
@@ -107,6 +109,35 @@ export const postMessage = (body) => async (dispatch) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const updateMessageReadStatus = async (body) => {
+    const { data } = await axios.post("/api/messages/status/read", body);
+    return data;
+};
+
+export const updateConversationMessageReadStatus = (body) => async (dispatch) =>  {
+    try {
+        
+        if (!body.conversationId) { return;}
+        
+        const result = await updateMessageReadStatus(body)
+    
+        if(result.status){
+            dispatch(updateConversationReadStatus(body.conversationId, body.userId));
+        }
+
+        sendMessageRead(body.conversationId, body.recipientId)
+
+    } catch (error) {
+        console.error(error);
+    }
+    
+    
+};
+
+const sendMessageRead = (conversationId, recipientId) => {
+    socket.emit("message-read", { conversationId, recipientId });
 };
 
 export const searchUsers = (searchTerm) => async (dispatch) => {
