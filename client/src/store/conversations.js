@@ -5,7 +5,6 @@ import {
   removeOfflineUserFromStore,
   addMessageToStore,
   updateConversationMessageStatus,
-  conversationMessageRead
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -18,7 +17,6 @@ const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
 const UPDATE_CONVERSATION_MESSAGE_STATUS = "UPDATE_CONVERSATION_MESSAGE_STATUS";
-const UPDATE_CONVERSATION_MESSAGE_READ = "UPDATE_CONVERSATION_MESSAGE_READ";
 
 // ACTION CREATORS
 
@@ -32,7 +30,7 @@ export const gotConversations = (conversations) => {
 export const setNewMessage = (message, sender) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null },
+    payload: { message, sender: sender || null},
   };
 };
 
@@ -71,19 +69,12 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const updateConversationReadStatus = (conversationId, userId) => {
-    return {
-        type: UPDATE_CONVERSATION_MESSAGE_STATUS,
-        payload: { conversationId, userId },
-      };
-}
-
-export const updateConversationMessageRead = (conversationId, userId) => {
-    return {
-        type: UPDATE_CONVERSATION_MESSAGE_READ,
-        payload: { conversationId, userId },
-      };
-}
+export const updateMessageStatus = (conversationId, userId) => {
+  return {
+    type: UPDATE_CONVERSATION_MESSAGE_STATUS,
+    payload: { conversationId, userId },
+  };
+};
 
 // REDUCER
 
@@ -110,13 +101,12 @@ const reducer = (state = [], action) => {
         action.payload.newMessage
       );
     case UPDATE_CONVERSATION_MESSAGE_STATUS:
-        return updateConversationMessageStatus(state, 
-            action.payload.conversationId,
-            action.payload.userId)
-    case UPDATE_CONVERSATION_MESSAGE_READ:
-        return conversationMessageRead(state, 
-            action.payload.conversationId,
-            action.payload.userId)
+      return updateConversationMessageStatus(
+        state,
+        action.payload.conversationId,
+        action.payload.userId
+      );
+
     default:
       return state;
   }

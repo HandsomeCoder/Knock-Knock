@@ -27,60 +27,50 @@ const styles = {
     color: "white",
     marginRight: "15px",
     fontWeight: "bold",
-    fontSize: "12px"
-  }
+    fontSize: "12px",
+  },
 };
 
 class Chat extends Component {
-
   constructor() {
-		super();
-		this.unreadMessagesCount = 0;
-	}
-
-	createRequestForUpdateState(userId, recipientId, conversationId){
-		return { userId, recipientId, conversationId }
-	}
+    super();
+    this.unreadMessagesCount = 0;
+  }
 
   handleClick = async (conversation) => {
-	  const { user, setActiveChat, setActiveId, updateReadStatus } = this.props;
+    const {
+      user,
+      setActiveChat,
+      setActiveConversationId,
+      updateConversationMessageReadStatus,
+    } = this.props;
 
     await setActiveChat(conversation.otherUser.username);
-    await setActiveId(conversation.id);
-    
-    if(this.unreadMessagesCount > 0){ 
-        updateReadStatus(this.createRequestForUpdateState(user.id, 
-                            conversation.otherUser.id, conversation.id));
+    await setActiveConversationId(conversation.id);
+
+    if (this.unreadMessagesCount > 0) {
+      updateConversationMessageReadStatus({
+        userId: user.id,
+        recipientId: conversation.otherUser.id,
+        conversationId: conversation.id,
+      });
     }
   };
 
-  componentDidUpdate(){
-    const { user, conversation, activeConversationId, updateReadStatus } = this.props;
-
-		if(this.unreadMessagesCount  > 0 && conversation.id === activeConversationId){
-			updateReadStatus(this.createRequestForUpdateState(user.id, 
-                            conversation.otherUser.id, conversation.id));
-		}
-  }
-
-	getUnreadMessageCount(conversationId, messages){
-		this.unreadMessagesCount = messages.filter(msg => msg.senderId !== this.props.user.id)
-																.reduce((acc, curr) => curr.readStatus ? acc : acc + 1, 0);
-
-		return (this.props.activeConversationId === conversationId) ? 0 : this.unreadMessagesCount;
-	}
-
   render() {
-    const { classes, conversation } = this.props;
+    const { classes, conversation, activeConversationId } = this.props;
     const otherUser = conversation.otherUser;
-		
-		const displayUnreadMessageCount = this.getUnreadMessageCount(conversation.id, 
-																						conversation.messages);
+
+    const displayUnreadMessageCount =
+      activeConversationId === conversation.id
+        ? 0
+        : conversation.unreadMessagesCount;
 
     return (
       <Box
         onClick={() => this.handleClick(this.props.conversation)}
-        className={classes.root}>
+        className={classes.root}
+      >
         <BadgeAvatar
           photoUrl={otherUser.photoUrl}
           username={otherUser.username}
@@ -88,8 +78,11 @@ class Chat extends Component {
           sidebar={true}
         />
         <ChatContent conversation={this.props.conversation} />
-        {displayUnreadMessageCount > 0 && 
-            <div className={classes.unreadMessages}>{displayUnreadMessageCount}</div>}
+        {displayUnreadMessageCount > 0 && (
+          <div className={classes.unreadMessages}>
+            {displayUnreadMessageCount}
+          </div>
+        )}
       </Box>
     );
   }
@@ -100,21 +93,24 @@ const mapDispatchToProps = (dispatch) => {
     setActiveChat: (username) => {
       dispatch(setActiveChat(username));
     },
-    setActiveId: (id) => {
+    setActiveConversationId: (id) => {
       dispatch(setActiveConversationId(id));
     },
-    updateReadStatus: (id, userId) => {
-        dispatch(updateConversationMessageReadStatus(id, userId));
-    }
+    updateConversationMessageReadStatus: (body) => {
+      dispatch(updateConversationMessageReadStatus(body));
+    },
   };
 };
 
 const mapStateToProps = (state) => {
-    return {
-      user: state.user,
-      activeConversationName: state.activeConversation.username,
-      activeConversationId: state.activeConversation.id
-    };
+  return {
+    user: state.user,
+    activeConversationName: state.activeConversation.username,
+    activeConversationId: state.activeConversation.id,
   };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Chat));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(Chat));

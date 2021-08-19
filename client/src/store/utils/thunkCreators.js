@@ -5,8 +5,13 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
-  updateConversationReadStatus
+  updateMessageStatus,
 } from "../conversations";
+
+import {
+  getOtherUserLastMessageReadId,
+  getUnreadMessageCount,
+} from "./conversationUtils";
 
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -74,6 +79,19 @@ export const logout = (id) => async (dispatch) => {
 export const fetchConversations = () => async (dispatch) => {
   try {
     const { data } = await axios.get("/api/conversations");
+
+    for (let conversation of data) {
+      conversation.latestReadMessageId = getOtherUserLastMessageReadId(
+        conversation.messages,
+        conversation.otherUser.id
+      );
+
+      conversation.unreadMessageCount = getUnreadMessageCount(
+        conversation.messages,
+        conversation.otherUser.id
+      );
+    }
+
     dispatch(gotConversations(data));
   } catch (error) {
     console.error(error);
@@ -112,32 +130,36 @@ export const postMessage = (body) => async (dispatch) => {
 };
 
 const updateMessageReadStatus = async (body) => {
-    const { data } = await axios.post("/api/messages/status/read", body);
-    return data;
+  const { data } = await axios.put("/api/messages/status/read", body);
+  return data;
 };
 
-export const updateConversationMessageReadStatus = (body) => async (dispatch) =>  {
+export const updateConversationMessageReadStatus =
+  (body) => async (dispatch) => {
+
+    console.log(body);
+
     try {
-        
-        if (!body.conversationId) { return;}
-        
-        const result = await updateMessageReadStatus(body)
-    
-        if(result.status){
-            dispatch(updateConversationReadStatus(body.conversationId, body.userId));
-        }
+      if (!body.conversationId) {
+        return;
+      }
 
-        sendMessageRead(body.conversationId, body.recipientId)
+      const result = await updateMessageReadStatus(body);
 
+      if (result.status) {
+         dispatch(
+           updateMessageStatus(body.conversationId, body.userId)
+         );
+      }
+
+      sendMessageRead(body.conversationId, body.recipientId);
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-    
-    
-};
+  };
 
 const sendMessageRead = (conversationId, recipientId) => {
-    socket.emit("message-read", { conversationId, recipientId });
+  socket.emit("message-read", { conversationId, recipientId });
 };
 
 export const searchUsers = (searchTerm) => async (dispatch) => {
