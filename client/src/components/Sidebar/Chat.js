@@ -2,7 +2,11 @@ import React, { Component } from "react";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { withStyles } from "@material-ui/core/styles";
-import { setActiveChat } from "../../store/activeConversation";
+import {
+  setActiveChat,
+  setActiveConversationId,
+} from "../../store/activeConversation";
+import { updateConversationMessageReadStatus } from "../../store/utils/thunkCreators";
 import { connect } from "react-redux";
 
 const styles = {
@@ -17,16 +21,48 @@ const styles = {
       cursor: "grab",
     },
   },
+  unreadMessages: {
+    border: "1px",
+    display: "inline-block",
+    background: "#3A8DFF",
+    padding: "1px 7px",
+    borderRadius: "10px",
+    color: "white",
+    marginRight: "15px",
+    fontWeight: "bold",
+    fontSize: "12px",
+  },
 };
 
 class Chat extends Component {
   handleClick = async (conversation) => {
-    await this.props.setActiveChat(conversation.otherUser.username);
+    const {
+      user,
+      setActiveChat,
+      setActiveConversationId,
+      updateConversationMessageReadStatus,
+    } = this.props;
+
+    await setActiveChat(conversation.otherUser.username);
+    await setActiveConversationId(conversation.id);
+
+    if (conversation.unreadMessagesCount > 0) {
+      updateConversationMessageReadStatus({
+        userId: user.id,
+        conversationId: conversation.id,
+      });
+    }
   };
 
   render() {
-    const { classes } = this.props;
-    const otherUser = this.props.conversation.otherUser;
+    const { classes, conversation, activeConversationId } = this.props;
+    const otherUser = conversation.otherUser;
+
+    const displayUnreadMessageCount =
+      activeConversationId === conversation.id
+        ? 0
+        : conversation.unreadMessagesCount;
+
     return (
       <Box
         onClick={() => this.handleClick(this.props.conversation)}
@@ -39,6 +75,11 @@ class Chat extends Component {
           sidebar={true}
         />
         <ChatContent conversation={this.props.conversation} />
+        {displayUnreadMessageCount > 0 && (
+          <div className={classes.unreadMessages}>
+            {displayUnreadMessageCount}
+          </div>
+        )}
       </Box>
     );
   }
@@ -46,10 +87,27 @@ class Chat extends Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setActiveChat: (id) => {
-      dispatch(setActiveChat(id));
+    setActiveChat: (username) => {
+      dispatch(setActiveChat(username));
+    },
+    setActiveConversationId: (id) => {
+      dispatch(setActiveConversationId(id));
+    },
+    updateConversationMessageReadStatus: (body) => {
+      dispatch(updateConversationMessageReadStatus(body));
     },
   };
 };
 
-export default connect(null, mapDispatchToProps)(withStyles(styles)(Chat));
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+    activeConversationName: state.activeConversation.username,
+    activeConversationId: state.activeConversation.id,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(Chat));
