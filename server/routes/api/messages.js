@@ -35,7 +35,7 @@ router.post("/", async (req, res, next) => {
         senderId,
         text,
         conversationId,
-        readStatus: false
+        readStatus: false,
       });
 
       Conversation.update(
@@ -66,8 +66,13 @@ router.post("/", async (req, res, next) => {
       senderId,
       text,
       conversationId: conversation.id,
-      readStatus: false
+      readStatus: false,
     });
+
+    Conversation.update(
+      { updatedByUserId: senderId },
+      { where: { id: conversation.id } }
+    );
 
     res.json({ message, sender });
   } catch (error) {
@@ -90,9 +95,12 @@ router.put("/status/read", async (req, res, next) => {
     }
 
     // Check whether user is part of conversation or not
-    const conversation = await Conversation.isConversationExists(conversationId, userId);
+    const conversation = await Conversation.isConversationExists(
+      conversationId,
+      userId
+    );
 
-    if(!conversation){
+    if (!conversation) {
       return res.sendStatus(401);
     }
 

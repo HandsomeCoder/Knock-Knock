@@ -48,7 +48,7 @@ const Messages = (props) => {
     if (isAutoScroll || sentByLoggedInUser) {
       scrollToBottom(messageContainer.current, true);
     }
-  }, [messages.length, messages, userId, isAutoScroll]);
+  }, [messages, userId, isAutoScroll]);
 
   return (
     <Box ref={messageContainer} className={props.className}>

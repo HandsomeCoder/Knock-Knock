@@ -2,7 +2,10 @@ import React, { Component } from "react";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { withStyles } from "@material-ui/core/styles";
-import { setActiveChat, setActiveConversationId } from "../../store/activeConversation";
+import {
+  setActiveChat,
+  setActiveConversationId,
+} from "../../store/activeConversation";
 import { updateConversationMessageReadStatus } from "../../store/utils/thunkCreators";
 import { connect } from "react-redux";
 
@@ -32,11 +35,6 @@ const styles = {
 };
 
 class Chat extends Component {
-  constructor() {
-    super();
-    this.unreadMessagesCount = 0;
-  }
-
   handleClick = async (conversation) => {
     const {
       user,
@@ -48,10 +46,9 @@ class Chat extends Component {
     await setActiveChat(conversation.otherUser.username);
     await setActiveConversationId(conversation.id);
 
-    if (this.unreadMessagesCount > 0) {
+    if (conversation.unreadMessagesCount > 0) {
       updateConversationMessageReadStatus({
         userId: user.id,
-        recipientId: conversation.otherUser.id,
         conversationId: conversation.id,
       });
     }

@@ -30,7 +30,7 @@ export const gotConversations = (conversations) => {
 export const setNewMessage = (message, sender) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null},
+    payload: { message, sender: sender || null },
   };
 };
 
@@ -69,10 +69,10 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const updateMessageStatus = (conversationId, userId) => {
+export const updateMessageStatus = (conversationId, readByUserId) => {
   return {
     type: UPDATE_CONVERSATION_MESSAGE_STATUS,
-    payload: { conversationId, userId },
+    payload: { conversationId, readByUserId },
   };
 };
 
@@ -104,7 +104,7 @@ const reducer = (state = [], action) => {
       return updateConversationMessageStatus(
         state,
         action.payload.conversationId,
-        action.payload.userId
+        action.payload.readByUserId
       );
 
     default:

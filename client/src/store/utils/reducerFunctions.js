@@ -3,7 +3,6 @@ import {
   getUnreadMessageCount,
 } from "./conversationUtils";
 
-
 export const addMessageToStore = (state, payload) => {
   const { message, sender } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
@@ -30,7 +29,7 @@ export const addMessageToStore = (state, payload) => {
     .map((convo) => {
       if (convo.id === message.conversationId) {
         const convoCopy = { ...convo };
-        convoCopy.messages.push(message);
+        convoCopy.messages = [...convoCopy.messages, message];
         convoCopy.latestMessageText = message.text;
         convoCopy.latestMessageAt = message.updatedAt;
         convoCopy.latestReadMessageId = getOtherUserLastMessageReadId(
@@ -108,12 +107,16 @@ export const addNewConvoToStore = (state, recipientId, message) => {
   });
 };
 
-export const updateConversationMessageStatus = (state, conversationId, userId) => {
+export const updateConversationMessageStatus = (
+  state,
+  conversationId,
+  readByUserId
+) => {
   return state.map((convo) => {
     if (convo.id === conversationId) {
       const newConvo = { ...convo };
       newConvo.messages = newConvo.messages.map((msg) => {
-        if (msg.senderId === userId) {
+        if (msg.senderId !== readByUserId) {
           msg.readStatus = true;
         }
         return msg;
@@ -123,6 +126,7 @@ export const updateConversationMessageStatus = (state, conversationId, userId) =
         newConvo.messages,
         newConvo.otherUser.id
       );
+
       newConvo.unreadMessagesCount = getUnreadMessageCount(
         newConvo.messages,
         newConvo.otherUser.id

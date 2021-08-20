@@ -80,13 +80,13 @@ export const fetchConversations = () => async (dispatch) => {
   try {
     const { data } = await axios.get("/api/conversations");
 
-    for (let conversation of data) {
+    for (const conversation of data) {
       conversation.latestReadMessageId = getOtherUserLastMessageReadId(
         conversation.messages,
         conversation.otherUser.id
       );
 
-      conversation.unreadMessageCount = getUnreadMessageCount(
+      conversation.unreadMessagesCount = getUnreadMessageCount(
         conversation.messages,
         conversation.otherUser.id
       );
@@ -136,9 +136,6 @@ const updateMessageReadStatus = async (body) => {
 
 export const updateConversationMessageReadStatus =
   (body) => async (dispatch) => {
-
-    console.log(body);
-
     try {
       if (!body.conversationId) {
         return;
@@ -147,12 +144,10 @@ export const updateConversationMessageReadStatus =
       const result = await updateMessageReadStatus(body);
 
       if (result.status) {
-         dispatch(
-           updateMessageStatus(body.conversationId, body.userId)
-         );
+        dispatch(updateMessageStatus(body.conversationId, body.userId));
       }
 
-      sendMessageRead(body.conversationId, body.recipientId);
+      sendMessageRead(body.conversationId, body.userId);
     } catch (error) {
       console.error(error);
     }
