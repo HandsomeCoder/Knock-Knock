@@ -43,6 +43,8 @@ const Messages = (props) => {
     }
 
     const sentByLoggedInUser =
+      messages &&
+      messages.length > 0 &&
       messages[messages.length - 1].senderId === userId;
 
     if (isAutoScroll || sentByLoggedInUser) {

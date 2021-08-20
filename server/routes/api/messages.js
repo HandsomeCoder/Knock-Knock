@@ -13,7 +13,7 @@ router.post("/", async (req, res, next) => {
     const senderId = req.user.id;
     const { recipientId, text, conversationId, sender } = req.body;
 
-    if (conversationId !== null) {
+    if (conversationId) {
       const message = await Message.create({
         senderId,
         text,
