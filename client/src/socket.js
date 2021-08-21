@@ -12,8 +12,6 @@ import { updateConversationMessageReadStatus } from "./store/utils/thunkCreators
 const socket = io(window.location.origin);
 
 socket.on("connect", () => {
-  console.log("connected to server");
-
   socket.on("add-online-user", (id) => {
     store.dispatch(addOnlineUser(id));
   });
@@ -33,13 +31,14 @@ socket.on("connect", () => {
         updateConversationMessageReadStatus({
           conversationId: message.conversationId,
           userId: appState.user.id,
+          recipientId: message.senderId
         })
       );
     }
   });
 
   socket.on("message-read", (data) => {
-    store.dispatch(updateMessageStatus(data.conversationId, data.recipientId));
+    store.dispatch(updateMessageStatus(data.conversationId, data.readByUserId));
   });
 });
 

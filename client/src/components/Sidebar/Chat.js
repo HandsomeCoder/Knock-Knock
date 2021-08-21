@@ -50,6 +50,7 @@ class Chat extends Component {
       updateConversationMessageReadStatus({
         userId: user.id,
         conversationId: conversation.id,
+        recipientId: conversation.otherUser.id,
       });
     }
   };

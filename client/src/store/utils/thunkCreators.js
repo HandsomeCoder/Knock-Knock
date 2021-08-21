@@ -13,6 +13,8 @@ import {
   getUnreadMessageCount,
 } from "./conversationUtils";
 
+import { setActiveConversationId } from "../activeConversation";
+
 import { gotUser, setFetchingStatus } from "../user";
 
 axios.interceptors.request.use(async function (config) {
@@ -119,6 +121,7 @@ export const postMessage = (body) => async (dispatch) => {
 
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
+      dispatch(setActiveConversationId(data.message.conversationId));
     } else {
       dispatch(setNewMessage(data.message));
     }
@@ -147,14 +150,14 @@ export const updateConversationMessageReadStatus =
         dispatch(updateMessageStatus(body.conversationId, body.userId));
       }
 
-      sendMessageRead(body.conversationId, body.userId);
+      sendMessageRead(body.conversationId, body.userId, body.recipientId);
     } catch (error) {
       console.error(error);
     }
   };
 
-const sendMessageRead = (conversationId, recipientId) => {
-  socket.emit("message-read", { conversationId, recipientId });
+const sendMessageRead = (conversationId, readByUserId, recipientId) => {
+  socket.emit("message-read", { conversationId, readByUserId, recipientId });
 };
 
 export const searchUsers = (searchTerm) => async (dispatch) => {
