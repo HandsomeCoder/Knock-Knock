@@ -12,6 +12,8 @@ const http = require("http");
 const db = require("../db");
 const onlineUsers = require("../onlineUsers");
 
+const jwt = require("jsonwebtoken");
+
 /**
  * Get port from environment and store in Express.
  */
@@ -31,11 +33,23 @@ const server = http.createServer(app);
 
 const io = require("socket.io")(server);
 
-io.on("connection", (socket) => {
+io.use(function (socket, next) {
+  if (socket.handshake.auth && socket.handshake.auth.token) {
+    jwt.verify(
+      socket.handshake.auth.token,
+      process.env.SESSION_SECRET,
+      function (err, decoded) {
+        if (err) return next(new Error("Authentication error"));
+        socket.decoded = decoded;
+        next();
+      }
+    );
+  } else {
+    next(new Error("Authentication error"));
+  }
+}).on("connection", (socket) => {
   socket.on("go-online", async (id) => {
-    if (!onlineUsers.has(socket.id)) {
-      onlineUsers.set(id, { socketId: socket.id });
-    }
+    onlineUsers.set(id, { socketId: socket.id });  
     // send the user who just went online to everyone else who is already online
     socket.broadcast.emit("add-online-user", id);
   });
@@ -52,8 +66,9 @@ io.on("connection", (socket) => {
 
   socket.on("logout", (id) => {
     if (onlineUsers.has(id)) {
-      socket.to(onlineUsers.get(id).socketId).emit("remove-offline-user", id);
+      socket.broadcast.emit("remove-offline-user", id);
       onlineUsers.delete(id);
+      socket.disconnect();
     }
   });
 

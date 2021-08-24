@@ -9,37 +9,54 @@ import {
 
 import { updateConversationMessageReadStatus } from "./store/utils/thunkCreators";
 
-const socket = io(window.location.origin);
+const socket = io(window.location.origin, {
+  reconnection: false,
+  autoConnect: true,
+  auth: { token: localStorage.getItem("messenger-token") },
+});
 
-socket.on("connect", () => {
-  socket.on("add-online-user", (id) => {
-    store.dispatch(addOnlineUser(id));
-  });
+export const openSocket = () => {
+  const token = localStorage.getItem("messenger-token");
+  socket.auth.token = token;
 
-  socket.on("remove-offline-user", (id) => {
-    store.dispatch(removeOfflineUser(id));
-  });
+  if (!token) {
+    return;
+  }
 
-  socket.on("new-message", (data) => {
-    const { message, sender } = data;
-    const appState = store.getState();
+  socket.connect();
+};
 
-    store.dispatch(setNewMessage(message, sender));
+export const sendEvent = async (name, data) => {
+  socket.emit(name, data);
+};
 
-    if (message.conversationId === appState.activeConversation.id) {
-      store.dispatch(
-        updateConversationMessageReadStatus({
-          conversationId: message.conversationId,
-          userId: appState.user.id,
-          recipientId: message.senderId
-        })
-      );
-    }
-  });
+socket.on("add-online-user", (id) => {
+  store.dispatch(addOnlineUser(id));
+});
 
-  socket.on("message-read", (data) => {
-    store.dispatch(updateMessageStatus(data.conversationId, data.readByUserId));
-  });
+socket.on("remove-offline-user", (id) => {
+  store.dispatch(removeOfflineUser(id));
+});
+
+socket.on("new-message", (data) => {
+  const { message, sender } = data;
+  const appState = store.getState();
+
+  store.dispatch(setNewMessage(message, sender));
+
+  if (message.conversationId === appState.activeConversation.id) {
+    store.dispatch(
+      updateConversationMessageReadStatus({
+        conversationId: message.conversationId,
+        userId: appState.user.id,
+        recipientId: message.senderId,
+      })
+    );
+  }
+});
+
+socket.on("message-read", (data) => {
+  store.dispatch(updateMessageStatus(data.conversationId, data.readByUserId));
 });
 
 export default socket;
