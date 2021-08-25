@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { withStyles } from "@material-ui/core/styles";
@@ -7,7 +8,6 @@ import {
   setActiveConversationId,
 } from "../../store/activeConversation";
 import { updateConversationMessageReadStatus } from "../../store/utils/thunkCreators";
-import { connect } from "react-redux";
 
 const styles = {
   root: {
@@ -34,81 +34,56 @@ const styles = {
   },
 };
 
-class Chat extends Component {
-  handleClick = async (conversation) => {
-    const {
-      user,
-      setActiveChat,
-      setActiveConversationId,
-      updateConversationMessageReadStatus,
-    } = this.props;
+const Chat = (props) => {
+  const { classes, conversation } = props;
 
-    await setActiveChat(conversation.otherUser.username);
-    await setActiveConversationId(conversation.id);
+  const user = useSelector((state) => state.user);
+
+  const activeConversationId = useSelector(
+    (state) => state.activeConversation.id
+  );
+
+  const { otherUser } = conversation;
+
+  const displayUnreadMessageCount =
+    activeConversationId === conversation.id
+      ? 0
+      : conversation.unreadMessagesCount;
+
+  const dispatch = useDispatch();
+
+  const handleClick = (conversation) => {
+    dispatch(setActiveChat(conversation.otherUser.username));
+    dispatch(setActiveConversationId(conversation.id));
 
     if (conversation.unreadMessagesCount > 0) {
-      updateConversationMessageReadStatus({
+      dispatch(updateConversationMessageReadStatus({
         userId: user.id,
         conversationId: conversation.id,
         recipientId: conversation.otherUser.id,
-      });
+      }));
     }
   };
 
-  render() {
-    const { classes, conversation, activeConversationId } = this.props;
-    const otherUser = conversation.otherUser;
-
-    const displayUnreadMessageCount =
-      activeConversationId === conversation.id
-        ? 0
-        : conversation.unreadMessagesCount;
-
-    return (
-      <Box
-        onClick={() => this.handleClick(this.props.conversation)}
-        className={classes.root}
-      >
-        <BadgeAvatar
-          photoUrl={otherUser.photoUrl}
-          username={otherUser.username}
-          online={otherUser.online}
-          sidebar={true}
-        />
-        <ChatContent conversation={this.props.conversation} />
-        {displayUnreadMessageCount > 0 && (
-          <div className={classes.unreadMessages}>
-            {displayUnreadMessageCount}
-          </div>
-        )}
-      </Box>
-    );
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setActiveChat: (username) => {
-      dispatch(setActiveChat(username));
-    },
-    setActiveConversationId: (id) => {
-      dispatch(setActiveConversationId(id));
-    },
-    updateConversationMessageReadStatus: (body) => {
-      dispatch(updateConversationMessageReadStatus(body));
-    },
-  };
+  return (
+    <Box
+      onClick={() => handleClick(props.conversation)}
+      className={classes.root}
+    >
+      <BadgeAvatar
+        photoUrl={otherUser.photoUrl}
+        username={otherUser.username}
+        online={otherUser.online}
+        sidebar={true}
+      />
+      <ChatContent conversation={props.conversation} />
+      {displayUnreadMessageCount > 0 && (
+        <div className={classes.unreadMessages}>
+          {displayUnreadMessageCount}
+        </div>
+      )}
+    </Box>
+  );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-    activeConversationName: state.activeConversation.username,
-    activeConversationId: state.activeConversation.id,
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(Chat));
+export default withStyles(styles)(Chat);
