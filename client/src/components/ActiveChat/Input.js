@@ -35,7 +35,7 @@ class Input extends Component {
     event.preventDefault();
     const text = event.target.text.value;
 
-    if (text && text.trim().length === 0) {
+    if (text.length === 0 || text.trim().length === 0) {
       return;
     }
 

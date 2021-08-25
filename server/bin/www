@@ -34,22 +34,21 @@ const server = http.createServer(app);
 const io = require("socket.io")(server);
 
 io.use(function (socket, next) {
-  if (socket.handshake.auth && socket.handshake.auth.token) {
-    jwt.verify(
-      socket.handshake.auth.token,
-      process.env.SESSION_SECRET,
-      function (err, decoded) {
-        if (err) return next(new Error("Authentication error"));
-        socket.decoded = decoded;
-        next();
-      }
-    );
+  const token = socket.handshake.auth ? socket.handshake.auth.token : null;
+  if (token) {
+    jwt.verify(token, process.env.SESSION_SECRET, function (err, decoded) {
+      if (err) return next(new Error("Authentication error"));
+      socket.decoded = decoded;
+      next();
+    });
   } else {
     next(new Error("Authentication error"));
   }
 }).on("connection", (socket) => {
-  socket.on("go-online", async (id) => {
-    onlineUsers.set(id, { socketId: socket.id });  
+  socket.on("go-online", async () => {
+    const id = socket.decoded.id;
+
+    onlineUsers.set(id, { socketId: socket.id });
     // send the user who just went online to everyone else who is already online
     socket.broadcast.emit("add-online-user", id);
   });
@@ -64,7 +63,9 @@ io.use(function (socket, next) {
     }
   });
 
-  socket.on("logout", (id) => {
+  socket.on("logout", () => {
+    const id = socket.decoded.id;
+
     if (onlineUsers.has(id)) {
       socket.broadcast.emit("remove-offline-user", id);
       onlineUsers.delete(id);

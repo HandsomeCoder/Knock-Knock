@@ -11,19 +11,15 @@ import { updateConversationMessageReadStatus } from "./store/utils/thunkCreators
 
 const socket = io(window.location.origin, {
   reconnection: false,
-  autoConnect: true,
-  auth: { token: localStorage.getItem("messenger-token") },
+  autoConnect: false,
+  auth: (cb) => {
+    cb({ token: localStorage.getItem("messenger-token") });
+  },
 });
 
 export const openSocket = () => {
-  const token = localStorage.getItem("messenger-token");
-  socket.auth.token = token;
-
-  if (!token) {
-    return;
-  }
-
   socket.connect();
+  sendEvent("go-online");
 };
 
 export const sendEvent = async (name, data) => {

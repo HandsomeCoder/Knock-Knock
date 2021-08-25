@@ -32,7 +32,7 @@ export const fetchUser = () => async (dispatch) => {
     const { data } = await axios.get("/auth/user");
     dispatch(gotUser(data));
     if (data.id) {
-      sendEvent("go-online", data.id);
+      openSocket();
     }
   } catch (error) {
     console.error(error);
@@ -46,8 +46,7 @@ export const register = (credentials) => async (dispatch) => {
     const { data } = await axios.post("/auth/register", credentials);
     await localStorage.setItem("messenger-token", data.token);
     dispatch(gotUser(data));
-    openSocket(data.token);
-    sendEvent("go-online", data.id);
+    openSocket();
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -59,8 +58,7 @@ export const login = (credentials) => async (dispatch) => {
     const { data } = await axios.post("/auth/login", credentials);
     localStorage.setItem("messenger-token", data.token);
     dispatch(gotUser(data));
-    openSocket(data.token);
-    sendEvent("go-online", data.id);
+    openSocket();
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -72,7 +70,7 @@ export const logout = (id) => async (dispatch) => {
     await axios.delete("/auth/logout");
     await localStorage.removeItem("messenger-token");
     dispatch(gotUser({}));
-    sendEvent("logout", id);
+    sendEvent("logout");
   } catch (error) {
     console.error(error);
   }
