@@ -9,38 +9,50 @@ import {
 
 import { updateConversationMessageReadStatus } from "./store/utils/thunkCreators";
 
-const socket = io(window.location.origin);
+const socket = io(window.location.origin, {
+  reconnection: false,
+  autoConnect: false,
+  auth: (cb) => {
+    cb({ token: localStorage.getItem("messenger-token") });
+  },
+});
 
-socket.on("connect", () => {
-  console.log("connected to server");
+export const openSocket = () => {
+  socket.connect();
+  sendEvent("go-online");
+};
 
-  socket.on("add-online-user", (id) => {
-    store.dispatch(addOnlineUser(id));
-  });
+export const sendEvent = async (name, data) => {
+  socket.emit(name, data);
+};
 
-  socket.on("remove-offline-user", (id) => {
-    store.dispatch(removeOfflineUser(id));
-  });
+socket.on("add-online-user", (id) => {
+  store.dispatch(addOnlineUser(id));
+});
 
-  socket.on("new-message", (data) => {
-    const { message, sender } = data;
-    const appState = store.getState();
+socket.on("remove-offline-user", (id) => {
+  store.dispatch(removeOfflineUser(id));
+});
 
-    store.dispatch(setNewMessage(message, sender));
+socket.on("new-message", (data) => {
+  const { message, sender } = data;
+  const appState = store.getState();
 
-    if (message.conversationId === appState.activeConversation.id) {
-      store.dispatch(
-        updateConversationMessageReadStatus({
-          conversationId: message.conversationId,
-          userId: appState.user.id,
-        })
-      );
-    }
-  });
+  store.dispatch(setNewMessage(message, sender));
 
-  socket.on("message-read", (data) => {
-    store.dispatch(updateMessageStatus(data.conversationId, data.recipientId));
-  });
+  if (message.conversationId === appState.activeConversation.id) {
+    store.dispatch(
+      updateConversationMessageReadStatus({
+        conversationId: message.conversationId,
+        userId: appState.user.id,
+        recipientId: message.senderId,
+      })
+    );
+  }
+});
+
+socket.on("message-read", (data) => {
+  store.dispatch(updateMessageStatus(data.conversationId, data.readByUserId));
 });
 
 export default socket;
