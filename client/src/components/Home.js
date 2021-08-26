@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { withStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
 import { Grid, CssBaseline, Button } from "@material-ui/core";
 import { SidebarContainer } from "./Sidebar";
@@ -11,14 +10,16 @@ import {
 } from "../store/utils/thunkCreators";
 import { clearOnLogout } from "../store/index";
 
+import useStyles from "../hooks/use-styles";
+
 const styles = {
   root: {
     height: "94vh",
   },
 };
 
-const Home = (props) => {
-  const { classes } = props;
+const Home = () => {
+  const classes = useStyles(styles);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -63,4 +64,4 @@ const Home = (props) => {
   );
 };
 
-export default withStyles(styles)(Home);
+export default Home;

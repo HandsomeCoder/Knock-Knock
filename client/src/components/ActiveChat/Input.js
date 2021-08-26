@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { FormControl, FilledInput } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 
 import { postMessage as sendMessage } from "../../store/utils/thunkCreators";
+
+import useStyles from "../../hooks/use-styles";
 
 const styles = {
   root: {
@@ -19,7 +20,8 @@ const styles = {
 };
 
 const Input = (props) => {
-  const { classes } = props;
+  const classes = useStyles(styles);
+  const { otherUser, conversationId } = props;
 
   const [text, setText] = useState("");
 
@@ -45,9 +47,9 @@ const Input = (props) => {
     // add sender user info if posting to a brand new convo, so that the other user will have access to username, profile pic, etc.
     const reqBody = {
       text,
-      recipientId: props.otherUser.id,
-      conversationId: props.conversationId,
-      sender: props.conversationId ? null : user,
+      recipientId: otherUser.id,
+      conversationId,
+      sender: conversationId ? null : user,
     };
     postMessage(reqBody);
     setText("");
@@ -69,4 +71,4 @@ const Input = (props) => {
   );
 };
 
-export default withStyles(styles)(Input);
+export default Input;

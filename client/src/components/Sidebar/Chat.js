@@ -2,12 +2,13 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
-import { withStyles } from "@material-ui/core/styles";
 import {
   setActiveChat,
   setActiveConversationId,
 } from "../../store/activeConversation";
 import { updateConversationMessageReadStatus } from "../../store/utils/thunkCreators";
+
+import useStyles from "../../hooks/use-styles";
 
 const styles = {
   root: {
@@ -35,7 +36,8 @@ const styles = {
 };
 
 const Chat = (props) => {
-  const { classes, conversation } = props;
+  const classes = useStyles(styles);
+  const { conversation } = props;
 
   const user = useSelector((state) => state.user);
 
@@ -57,11 +59,13 @@ const Chat = (props) => {
     dispatch(setActiveConversationId(conversation.id));
 
     if (conversation.unreadMessagesCount > 0) {
-      dispatch(updateConversationMessageReadStatus({
-        userId: user.id,
-        conversationId: conversation.id,
-        recipientId: conversation.otherUser.id,
-      }));
+      dispatch(
+        updateConversationMessageReadStatus({
+          userId: user.id,
+          conversationId: conversation.id,
+          recipientId: conversation.otherUser.id,
+        })
+      );
     }
   };
 
@@ -86,4 +90,4 @@ const Chat = (props) => {
   );
 };
 
-export default withStyles(styles)(Chat);
+export default Chat;

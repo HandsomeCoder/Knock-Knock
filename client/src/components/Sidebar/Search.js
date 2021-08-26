@@ -1,7 +1,8 @@
 import React from "react";
 import { FormControl, FilledInput, InputAdornment } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import { withStyles } from "@material-ui/core/styles";
+
+import useStyles from "../../hooks/use-styles";
 
 const styles = {
   filledInput: {
@@ -25,8 +26,8 @@ const styles = {
 };
 
 const Search = (props) => {
-  const { classes } = props;
-  
+  const classes = useStyles(styles);
+
   const handleSubmit = (event) => {
     event.preventDefault();
   };
@@ -51,4 +52,4 @@ const Search = (props) => {
   );
 };
 
-export default withStyles(styles)(Search);
+export default Search;
