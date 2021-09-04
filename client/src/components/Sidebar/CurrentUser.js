@@ -1,41 +1,42 @@
 import React from "react";
 import { Box, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { BadgeAvatar } from "./index";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 
-const useStyles = makeStyles(() => ({
+import useStyles from "../../hooks/use-styles";
+
+const styles = {
   root: {
     height: 44,
     marginTop: 23,
     marginLeft: 6,
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
   },
   subContainer: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    flexGrow: 1
+    flexGrow: 1,
   },
   username: {
     letterSpacing: -0.23,
     fontSize: 16,
     fontWeight: "bold",
-    marginLeft: 17
+    marginLeft: 17,
   },
   ellipsis: {
     color: "#95A7C4",
     marginRight: 24,
-    opacity: 0.5
-  }
-}));
+    opacity: 0.5,
+  },
+};
 
 const CurrentUser = (props) => {
-  const classes = useStyles();
+  const classes = useStyles(styles);
 
-  const user = props.user || {};
+  const user = useSelector((state) => state.user || {});
 
   return (
     <Box className={classes.root}>
@@ -48,10 +49,4 @@ const CurrentUser = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user
-  };
-};
-
-export default connect(mapStateToProps)(CurrentUser);
+export default CurrentUser;

@@ -1,16 +1,17 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
 import { Input, Header, Messages } from "./index";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 
-const useStyles = makeStyles(() => ({
+import useStyles from "../../hooks/use-styles";
+
+const style = {
   root: {
     display: "flex",
     flexGrow: 8,
     flexDirection: "column",
     maxHeight: "94vh",
-    overflow: "auto"
+    overflow: "auto",
   },
   chatContainer: {
     marginLeft: 41,
@@ -20,18 +21,27 @@ const useStyles = makeStyles(() => ({
     flexGrow: 1,
     justifyContent: "space-between",
     maxHeight: "74vh",
-    overflow: "auto"
+    overflow: "auto",
   },
   chatContent: {
     maxHeight: "57vh",
-    overflow: "auto"
-  }
-}));
+    overflow: "auto",
+  },
+};
 
-const ActiveChat = (props) => {
-  const classes = useStyles();
-  const { user } = props;
-  const conversation = props.conversation || {};
+const ActiveChat = () => {
+  const classes = useStyles(style);
+  const user = useSelector((state) => state.user);
+  const conversation = useSelector(
+    (state) =>
+      (state.conversations &&
+        state.conversations.find(
+          (conversation) =>
+            conversation.otherUser.username ===
+            state.activeConversation.username
+        )) ||
+      {}
+  );
 
   return (
     <Box className={classes.root}>
@@ -42,7 +52,8 @@ const ActiveChat = (props) => {
             online={conversation.otherUser.online || false}
           />
           <Box className={classes.chatContainer}>
-            <Messages className={classes.chatContent}
+            <Messages
+              className={classes.chatContent}
               messages={conversation.messages}
               otherUser={conversation.otherUser}
               latestReadMessageId={conversation.latestReadMessageId}
@@ -60,15 +71,4 @@ const ActiveChat = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-    conversation:
-      state.conversations &&
-      state.conversations.find(
-        (conversation) => conversation.otherUser.username === state.activeConversation.username
-      )
-  };
-};
-
-export default connect(mapStateToProps, null)(ActiveChat);
+export default ActiveChat;

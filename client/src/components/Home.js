@@ -1,12 +1,16 @@
-import React, { Component } from "react";
-import { withStyles } from "@material-ui/core/styles";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { connect } from "react-redux";
 import { Grid, CssBaseline, Button } from "@material-ui/core";
 import { SidebarContainer } from "./Sidebar";
 import { ActiveChat } from "./ActiveChat";
-import { logout, fetchConversations } from "../store/utils/thunkCreators";
+import {
+  logout as userLogout,
+  fetchConversations,
+} from "../store/utils/thunkCreators";
 import { clearOnLogout } from "../store/index";
+
+import useStyles from "../hooks/use-styles";
 
 const styles = {
   root: {
@@ -14,73 +18,50 @@ const styles = {
   },
 };
 
-class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoggedIn: false,
-    };
-  }
+const Home = () => {
+  const classes = useStyles(styles);
 
-  componentDidUpdate(prevProps) {
-    if (this.props.user.id !== prevProps.user.id) {
-      this.setState({
-        isLoggedIn: true,
-      });
-    }
-  }
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  componentDidMount() {
-    this.props.fetchConversations();
-  }
+  const user = useSelector((state) => state.user);
 
-  handleLogout = async () => {
-    await this.props.logout(this.props.user.id);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setIsLoggedIn(true);
+  }, [user.id]);
+
+  useEffect(() => {
+    dispatch(fetchConversations());
+  });
+
+  const logout = (id) => {
+    dispatch(userLogout(id));
+    dispatch(clearOnLogout());
   };
 
-  render() {
-    const { classes } = this.props;
-    if (!this.props.user.id) {
-      // If we were previously logged in, redirect to login instead of register
-      if (this.state.isLoggedIn) return <Redirect to="/login" />;
-      return <Redirect to="/register" />;
-    }
-    return (
-      <>
-        {/* logout button will eventually be in a dropdown next to username */}
-        <Button className={classes.logout} onClick={this.handleLogout}>
-          Logout
-        </Button>
-        <Grid container component="main" className={classes.root}>
-          <CssBaseline />
-          <SidebarContainer />
-          <ActiveChat />
-        </Grid>
-      </>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-    conversations: state.conversations,
+  const handleLogout = () => {
+    logout(user.id);
   };
+
+  if (!user.id) {
+    // If we were previously logged in, redirect to login instead of register
+    if (isLoggedIn) return <Redirect to="/login" />;
+    return <Redirect to="/register" />;
+  }
+  return (
+    <>
+      {/* logout button will eventually be in a dropdown next to username */}
+      <Button className={classes.logout} onClick={handleLogout}>
+        Logout
+      </Button>
+      <Grid container component="main" className={classes.root}>
+        <CssBaseline />
+        <SidebarContainer />
+        <ActiveChat />
+      </Grid>
+    </>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    logout: (id) => {
-      dispatch(logout(id));
-      dispatch(clearOnLogout());
-    },
-    fetchConversations: () => {
-      dispatch(fetchConversations());
-    },
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(Home));
+export default Home;
