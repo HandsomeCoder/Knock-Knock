@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = (style) => {
-  return makeStyles(() => style)();
+  return makeStyles((theme) => style)();
 };
 
 export default useStyles;

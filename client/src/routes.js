@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Route, Switch, withRouter } from "react-router-dom";
+import { Redirect, Route, Switch, withRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "./store/utils/thunkCreators";
-import Signup from "./Signup.js";
-import Login from "./Login.js";
 import { Home, SnackbarError } from "./components";
+import Landing from "./components/Landing/Landing";
+import Login from "./components/Login/Login";
+import Registration from "./components/Registration/Registration";
 
 const Routes = (props) => {
   const user = useSelector((state) => state.user);
@@ -43,14 +44,16 @@ const Routes = (props) => {
         />
       )}
       <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Signup} />
-        <Route
-          exact
-          path="/"
-          render={(props) => (props.user?.id ? <Home /> : <Signup />)}
-        />
-        <Route path="/home" component={Home} />
+        <Route exact path="/home" component={Home} />
+        <Route path="/"
+          render={(props) => (props.user?.id ? <Redirect to="/home" /> : <Landing>
+            <Switch>
+              <Route path="/login" component={Login} />
+              <Route path="/register" component={Registration} />
+              <Route component={Login} />
+            </Switch>
+          </Landing>)} />
+
       </Switch>
     </>
   );
