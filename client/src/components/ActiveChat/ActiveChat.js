@@ -10,7 +10,7 @@ const style = {
     display: "flex",
     flexGrow: 8,
     flexDirection: "column",
-    maxHeight: "94vh",
+    maxHeight: "100vh",
     overflow: "auto",
   },
   chatContainer: {
@@ -20,11 +20,11 @@ const style = {
     flexDirection: "column",
     flexGrow: 1,
     justifyContent: "space-between",
-    maxHeight: "74vh",
+    maxHeight: "87vh",
     overflow: "auto",
   },
   chatContent: {
-    maxHeight: "57vh",
+    maxHeight: "73vh",
     overflow: "auto",
   },
 };

@@ -9,6 +9,7 @@ import {
 import { updateConversationMessageReadStatus } from "../../store/utils/thunkCreators";
 
 import useStyles from "../../hooks/use-styles";
+import { theme } from "./../../themes/theme";
 
 const styles = {
   root: {
@@ -18,9 +19,13 @@ const styles = {
     marginBottom: 10,
     display: "flex",
     alignItems: "center",
+    cursor: "pointer",
     "&:hover": {
-      cursor: "grab",
+      backgroundColor: theme.palette.grey[200]
     },
+    '&.active': {
+      backgroundColor: theme.palette.blue.lighter
+    }
   },
   unreadMessages: {
     border: "1px",
@@ -46,11 +51,10 @@ const Chat = (props) => {
   );
 
   const { otherUser } = conversation;
-
-  const displayUnreadMessageCount =
-    activeConversationId === conversation.id
-      ? 0
-      : conversation.unreadMessagesCount;
+  const isActiveConversation = (activeConversationId === conversation.id)
+  
+  const displayUnreadMessageCount = isActiveConversation
+      ? 0 : conversation.unreadMessagesCount;
 
   const dispatch = useDispatch();
 
@@ -72,8 +76,7 @@ const Chat = (props) => {
   return (
     <Box
       onClick={() => handleClick(props.conversation)}
-      className={classes.root}
-    >
+      className={`${classes.root} ${isActiveConversation ? "active" : ""}`}>
       <BadgeAvatar
         photoUrl={otherUser.photoUrl}
         username={otherUser.username}

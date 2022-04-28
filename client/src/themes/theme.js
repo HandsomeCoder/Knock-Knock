@@ -18,7 +18,10 @@ export const theme = createTheme({
     }
   },
   palette: {
-    primary: { main: "#3A8DFF" },
-    secondary: { main: "#B0B0B0" }
+    primary: { main: "#3A8DFF", lighter: "#d7e8ff" },
+    secondary: { main: "#B0B0B0" },
+    blue: {
+      lighter: "#c4d9f6"
+    }
   }
 });
