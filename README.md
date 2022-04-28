@@ -1,4 +1,4 @@
-# Messenger
+# Knock-Knock Messenger
 
 A one-to-one realtime chat app.
 
