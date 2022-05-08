@@ -8,17 +8,17 @@ const Messages = (props) => {
   const { messages, otherUser, userId, latestReadMessageId } = props;
 
   const messageContainer = useRef(null);
-  const isAutoScroll = isScrollAtBottom(messageContainer.current);
+  const isAutoScroll = isScrollNotAtBottom(messageContainer.current);
 
   const activeConversationId = useSelector(
     (state) => state.activeConversation.id
   );
 
-  function isScrollAtBottom(element) {
+  function isScrollNotAtBottom(element) {
     return (
-      element &&
-      element.scrollHeight - Math.abs(element.scrollTop) ===
-        element.clientHeight
+      element ?
+        element.scrollHeight - Math.round(element.scrollTop) !== element.clientHeight 
+        : false
     );
   }
 
@@ -47,7 +47,8 @@ const Messages = (props) => {
       messages.length > 0 &&
       messages[messages.length - 1].senderId === userId;
 
-    if (isAutoScroll || sentByLoggedInUser) {
+    console.log(isAutoScroll)
+    if (isAutoScroll) {
       scrollToBottom(messageContainer.current, true);
     }
   }, [messages, userId, isAutoScroll]);

@@ -22,3 +22,4 @@ server/.env
 client/.vscode/settings.json
 server/.vscode/settings.json
 workspace.code-workspace
+client/build/

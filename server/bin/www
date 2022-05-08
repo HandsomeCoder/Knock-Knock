@@ -31,7 +31,12 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces, and sync database.
  */
 
-const io = require("socket.io")(server);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 io.use(function (socket, next) {
   const token = socket.handshake.auth ? socket.handshake.auth.token : null;

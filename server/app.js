@@ -1,5 +1,6 @@
 const createError = require("http-errors");
 const express = require("express");
+var cors = require('cors')
 const { join } = require("path");
 const logger = require("morgan");
 const jwt = require("jsonwebtoken");
@@ -15,6 +16,7 @@ const { json, urlencoded } = express;
 const app = express();
 
 app.use(logger("dev"));
+app.use(cors())
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(express.static(join(__dirname, "public")));

@@ -15,9 +15,12 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "socket.io-client": "^3.0.4"
+    "socket.io-client": "^3.0.4",
+    "ejs": "3.1.6",
+    "express": "4.17.3"
   },
   "scripts": {
+    "serve": "react-scripts build && node server/index.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

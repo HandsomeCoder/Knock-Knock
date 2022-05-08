@@ -9,7 +9,7 @@ import {
 
 import { updateConversationMessageReadStatus } from "./store/utils/thunkCreators";
 
-const socket = io(window.location.origin, {
+const socket = io(process.env.REACT_APP_SERVER_BASE_URL, {
   reconnection: false,
   autoConnect: false,
   auth: (cb) => {
