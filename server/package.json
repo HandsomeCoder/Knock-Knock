@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "node ./bin/www",
+    "deploy": "node ./bin/www",
     "seed": "node db/seed.js"
   },
   "dependencies": {
+    "compression": "^1.7.4",
     "connect-session-sequelize": "^7.0.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "ejs": "3.1.6",
-    "express": "^4.17.1",
+    "express": "4.17.3",
     "express-session": "^1.17.1",
     "http-errors": "~1.8.0",
     "jsonwebtoken": "^8.5.1",

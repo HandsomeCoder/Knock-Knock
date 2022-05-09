@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=messenger
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+  web:
+    image: knock-knock:1.0.0
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    depends_on:
+      - db

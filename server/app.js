@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const db = require("./db");
+const compression = require('compression');
+const path = require('path');
 const { User } = require("./db/models");
 // create store for sessions to persist in database
 const sessionStore = new SequelizeStore({ db });
@@ -43,6 +45,16 @@ app.use(function (req, res, next) {
 // require api routes here after I create them
 app.use("/auth", require("./routes/auth"));
 app.use("/api", require("./routes/api"));
+
+const buildPath = path.join(__dirname, '..', 'client', 'build');
+
+app.use(compression());
+app.use(express.static(buildPath));
+
+ 
+app.get('/*', function(req, res) {
+   res.sendFile(path.join(buildPath, 'index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
