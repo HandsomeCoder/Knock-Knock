@@ -6,6 +6,8 @@
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.11.2",
     "axios": "^0.21.0",
+    "ejs": "3.1.6",
+    "express": "4.17.3",
     "moment": "^2.29.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -15,13 +17,12 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "socket.io-client": "^3.0.4",
-    "ejs": "3.1.6",
-    "express": "4.17.3"
+    "socket.io-client": "^3.0.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "prod-build": "dotenv -e .env.heroku react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "react-scripts build && node server/index.js",
@@ -42,5 +43,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@dotenv/cli": "^2.2.2"
   }
 }

@@ -1,11 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM postgres:14-alpine
+FROM node:16-alpine
 
-ENV POSTGRES_USER postgres
-ENV POSTGRES_PASSWORD admin
-ENV POSTGRES_DB knock-knock
-
-RUN apk add --update nodejs npm
+RUN npm install -g dotenv-cli
 
 WORKDIR /app
 
@@ -17,7 +13,7 @@ WORKDIR /app/server
 RUN npm i
 
 WORKDIR /app/client
-RUN npm i && npm run build
+RUN npm i && npm run prod-build
 
 WORKDIR /app
 

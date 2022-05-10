@@ -1,12 +1,14 @@
-# Knock-Knock Messenger
 
+# Knock-Knock Messenger
 A one-to-one realtime chat app.
 
-## Running Application Locally
+## Running Application in Local
 
 ```
 psql
-CREATE  DATABASE messenger;
+
+CREATE DATABASE knock-knock;
+
 \q
 
 cd server
@@ -14,12 +16,21 @@ npm install
 
 // seed the database
 npm run seed
-
-npm run dev
+npm run serve
 ```
 
-Create a .env file in the server directory and add your session secret
+## Running Application in Docker
 
+Build Docker image
 ```
-SESSION_SECRET = "your session secret"
+docker image build -t <tag> knock-knock .
+```  
+
+Deploy Docker image
 ```
+docker run --name knock-knock -d -p 3000:3000 knock-knock:1.0.0
+```
+
+## Demo
+
+ https://knock-knock-messenger.herokuapp.com
